@@ -791,7 +791,7 @@ class Solver:
         print(f'q {int(self.get_cost(self.candidate_list[-1]))}')
 
 
-def read_carp_data(filename: str):
+def read_carp_data(filename: str, psize: int):
     '''
     read CARP data from given source and initialize a Solver instance
     '''
@@ -807,7 +807,7 @@ def read_carp_data(filename: str):
     n, depot, task_cnt, non_task_cnt, _, capacity, t_cost = map(
         int, params[1:8])
 
-    solver = Solver(name, n, depot, task_cnt, non_task_cnt, capacity, t_cost)
+    solver = Solver(name, n, depot, task_cnt, non_task_cnt, capacity, t_cost, psize=psize)
 
     for line in lines[9:]:
         if (line.startswith("END")):
@@ -866,13 +866,16 @@ if __name__ == "__main__":
     argParser.add_argument(
         "-s", "--seed", help="random seed used in the program", type=int)
     argParser.add_argument(
-        "-f", "--fetch", help="fetch information about the dataset and display them without solving the problem", action='store_true')
+        "-p", "--population", help="size of the population", type=int, default=30)
+    argParser.add_argument(
+        "-f", "--fetch", help="fetch information about the dataset and display them without solving the problem", action="store_const", const=True)
     cmd_args = argParser.parse_args()
 
     filename = cmd_args.file
     seed = cmd_args.seed
     runtime = cmd_args.time
-    solve = cmd_args.fetch is None
+    psize = cmd_args.population
+    solve = not cmd_args.fetch
 
     ### DEBUG
     # filename = "sample.dat"
@@ -880,7 +883,7 @@ if __name__ == "__main__":
     # runtime = 10
     ### DEBUG
 
-    solver = read_carp_data(filename)
+    solver = read_carp_data(filename, psize=psize)
     solver.seed = seed
     solver.calc_dist_map()
 
